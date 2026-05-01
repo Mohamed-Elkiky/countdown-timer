@@ -1,0 +1,350 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #f5f3ef;
+  --surface: #ffffff;
+  --surface-2: #f0ede8;
+  --border: rgba(0, 0, 0, 0.08);
+  --text-primary: #1a1814;
+  --text-secondary: #7a756c;
+  --text-muted: #b0aa9f;
+  --accent: #c9a96e;
+  --accent-light: #f5eede;
+  --accent-dark: #a07c3e;
+  --danger: #d9534f;
+  --success: #5a9e6f;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow: 0 2px 24px rgba(0, 0, 0, 0.07);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* ── Card ── */
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 3rem 3.5rem;
+  max-width: 560px;
+  width: 100%;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+/* ── Header ── */
+
+.card-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.label-pill {
+  display: inline-block;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 1rem;
+}
+
+.timer-title {
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  min-height: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.timer-title:hover {
+  color: var(--accent-dark);
+}
+
+.title-input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  border: none;
+  border-bottom: 1.5px solid var(--accent);
+  background: transparent;
+  outline: none;
+  text-align: center;
+  width: 100%;
+  padding-bottom: 4px;
+  display: none;
+}
+
+/* ── Countdown grid ── */
+
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 2.5rem;
+}
+
+.unit-block {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem 0.5rem 1rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s;
+}
+
+.unit-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.unit-block.active::before {
+  transform: scaleX(1);
+}
+
+.unit-number {
+  font-family: 'DM Mono', monospace;
+  font-size: 2.6rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  display: block;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.unit-number.flip {
+  transform: translateY(-4px);
+  opacity: 0.5;
+}
+
+.unit-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* ── Progress ── */
+
+.progress-wrap {
+  margin-bottom: 2rem;
+}
+
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.progress-bar-bg {
+  height: 4px;
+  background: var(--surface-2);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-light), var(--accent));
+  border-radius: 100px;
+  transition: width 1s linear;
+}
+
+/* ── Status ── */
+
+.status-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  display: inline-block;
+  margin-right: 6px;
+  transition: background 0.3s;
+}
+
+.status-dot.running {
+  background: var(--success);
+  animation: pulse 1.5s infinite;
+}
+
+.status-dot.done {
+  background: var(--accent);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Done message ── */
+
+.done-msg {
+  text-align: center;
+  padding: 1rem;
+  background: var(--accent-light);
+  border-radius: var(--radius-sm);
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  display: none;
+}
+
+/* ── Controls ── */
+
+.controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+.btn-primary {
+  background: var(--text-primary);
+  color: var(--surface);
+  border-color: var(--text-primary);
+}
+
+.btn-primary:hover {
+  background: #2d2a24;
+  color: var(--surface);
+}
+
+.btn-danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.btn-danger:hover {
+  background: #fdf0f0;
+}
+
+/* ── Setup section ── */
+
+.setup-section {
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.setup-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.duration-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.duration-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.duration-field label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.duration-field input {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--surface-2);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+  text-align: center;
+}
+
+.duration-field input:focus {
+  border-color: var(--accent);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 480px) {
+  .card {
+    padding: 2rem 1.5rem;
+  }
+
+  .unit-number {
+    font-size: 2rem;
+  }
+
+  .controls {
+    flex-wrap: wrap;
+  }
+}
