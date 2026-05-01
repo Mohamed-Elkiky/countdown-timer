@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Countdown Timer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="card">
+
+    <div class="card-header">
+      <div class="label-pill">Countdown</div>
+      <div class="timer-title" id="titleDisplay" title="Click to edit">Untitled Timer</div>
+      <input class="title-input" id="titleInput" type="text" maxlength="40" placeholder="Name your timer..." />
+    </div>
+
+    <div class="countdown-grid">
+      <div class="unit-block" id="block-d">
+        <span class="unit-number" id="days">00</span>
+        <span class="unit-label">Days</span>
+      </div>
+      <div class="unit-block" id="block-h">
+        <span class="unit-number" id="hours">00</span>
+        <span class="unit-label">Hours</span>
+      </div>
+      <div class="unit-block" id="block-m">
+        <span class="unit-number" id="minutes">00</span>
+        <span class="unit-label">Mins</span>
+      </div>
+      <div class="unit-block" id="block-s">
+        <span class="unit-number" id="seconds">00</span>
+        <span class="unit-label">Secs</span>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="progressLabel">0% elapsed</span>
+        <span id="progressTime">–</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="status-text">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Ready</span>
+    </div>
+
+    <div class="done-msg" id="doneMsg">&#10003; Time's up!</div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="startBtn">Start</button>
+      <button class="btn" id="pauseBtn">Pause</button>
+      <button class="btn" id="resumeBtn">Resume</button>
+      <button class="btn btn-danger" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-label">Set duration</div>
+      <div class="duration-inputs">
+        <div class="duration-field">
+          <label for="inputDays">Days</label>
+          <input type="number" id="inputDays" min="0" max="999" value="0" />
+        </div>
+        <div class="duration-field">
+          <label for="inputHours">Hours</label>
+          <input type="number" id="inputHours" min="0" max="23" value="0" />
+        </div>
+        <div class="duration-field">
+          <label for="inputMinutes">Minutes</label>
+          <input type="number" id="inputMinutes" min="0" max="59" value="5" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
