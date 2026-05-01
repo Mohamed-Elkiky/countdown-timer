@@ -23,10 +23,12 @@ countdown-timer/
 No build step required. Just clone the repo and open `index.html` in your browser.
 
 ```bash
-git clone https://github.com/your-username/countdown-timer.git
+https://github.com/Mohamed-Elkiky/countdown-timer.git
+
 cd countdown-timer
+
 open index.html
-```
+
 
 ## Usage
 

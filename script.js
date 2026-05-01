@@ -1,14 +1,17 @@
 // ── Element refs ──
-const titleDisplay = document.getElementById('titleDisplay');
-const titleInput   = document.getElementById('titleInput');
-const startBtn     = document.getElementById('startBtn');
-const pauseBtn     = document.getElementById('pauseBtn');
-const resumeBtn    = document.getElementById('resumeBtn');
-const resetBtn     = document.getElementById('resetBtn');
-const statusDot    = document.getElementById('statusDot');
-const statusText   = document.getElementById('statusText');
-const doneMsg      = document.getElementById('doneMsg');
-const progressFill = document.getElementById('progressFill');
+const titleDisplay  = document.getElementById('titleDisplay');
+const titleInput    = document.getElementById('titleInput');
+const timerName     = document.getElementById('timerName');
+const startBtn      = document.getElementById('startBtn');
+const pauseBtn      = document.getElementById('pauseBtn');
+const resumeBtn     = document.getElementById('resumeBtn');
+const resetBtn      = document.getElementById('resetBtn');
+const setupView     = document.getElementById('setupView');
+const timerView     = document.getElementById('timerView');
+const statusDot     = document.getElementById('statusDot');
+const statusText    = document.getElementById('statusText');
+const doneMsg       = document.getElementById('doneMsg');
+const progressFill  = document.getElementById('progressFill');
 const progressLabel = document.getElementById('progressLabel');
 const progressTime  = document.getElementById('progressTime');
 
@@ -17,27 +20,21 @@ let totalSeconds = 0;
 let remaining    = 0;
 let interval     = null;
 let running      = false;
-let prevValues   = { d: null, h: null, m: null, s: null };
-
-// ── Init ──
-updateDisplay(0);
-setButtonState('idle');
+let prevValues   = { days: null, hours: null, minutes: null, seconds: null };
 
 // ── Title editing ──
 titleDisplay.addEventListener('click', () => {
-  titleInput.value = titleDisplay.textContent === 'Untitled Timer' ? '' : titleDisplay.textContent;
+  titleInput.value           = titleDisplay.textContent === 'Untitled Timer' ? '' : titleDisplay.textContent;
   titleDisplay.style.display = 'none';
   titleInput.style.display   = 'block';
   titleInput.focus();
 });
 
 titleInput.addEventListener('blur', commitTitle);
-titleInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') titleInput.blur();
-});
+titleInput.addEventListener('keydown', e => { if (e.key === 'Enter') titleInput.blur(); });
 
 function commitTitle() {
-  const val = titleInput.value.trim();
+  const val                  = titleInput.value.trim();
   titleDisplay.textContent   = val || 'Untitled Timer';
   titleInput.style.display   = 'none';
   titleDisplay.style.display = 'block';
@@ -63,7 +60,12 @@ function startTimer() {
 
   totalSeconds = dur;
   remaining    = dur;
-  prevValues   = { d: null, h: null, m: null, s: null };
+  prevValues   = { days: null, hours: null, minutes: null, seconds: null };
+
+  timerName.textContent = titleDisplay.textContent;
+
+  setupView.classList.add('hidden');
+  timerView.classList.remove('hidden');
 
   doneMsg.style.display = 'none';
   updateDisplay(remaining);
@@ -107,23 +109,40 @@ function resetTimer() {
   running      = false;
   remaining    = 0;
   totalSeconds = 0;
-  prevValues   = { d: null, h: null, m: null, s: null };
+  prevValues   = { days: null, hours: null, minutes: null, seconds: null };
 
-  doneMsg.style.display       = 'none';
-  progressFill.style.width    = '0%';
-  progressLabel.textContent   = '0% elapsed';
-  progressTime.textContent    = '–';
+  timerView.classList.add('hidden');
+  setupView.classList.remove('hidden');
 
-  ['days', 'hours', 'minutes', 'seconds'].forEach(id => {
-    document.getElementById(id).textContent = '00';
-  });
-
-  setStatus('ready');
-  setButtonState('idle');
+  doneMsg.style.display     = 'none';
+  progressFill.style.width  = '0%';
+  progressLabel.textContent = '0% elapsed';
+  progressTime.textContent  = '–';
 }
 
-// ── Display ──
+// ── Roller animation ──
 function pad(n) { return String(n).padStart(2, '0'); }
+
+function rollDigit(id, newValue) {
+  const roller   = document.getElementById(id);
+  const oldInner = roller.querySelector('.digit-inner');
+  const newVal   = pad(newValue);
+
+  // animate old digit out downward
+  oldInner.classList.add('roll-out');
+
+  // create new digit entering from top
+  const newInner = document.createElement('div');
+  newInner.classList.add('digit-inner', 'roll-in');
+  newInner.textContent = newVal;
+
+  oldInner.addEventListener('animationend', () => {
+    roller.innerHTML = '';
+    roller.appendChild(newInner);
+  }, { once: true });
+
+  roller.appendChild(newInner);
+}
 
 function updateDisplay(secs) {
   const d = Math.floor(secs / 86400);
@@ -131,26 +150,13 @@ function updateDisplay(secs) {
   const m = Math.floor((secs % 3600) / 60);
   const s = secs % 60;
 
-  const cur  = { d, h, m, s };
-  const ids  = { d: 'days', h: 'hours', m: 'minutes', s: 'seconds' };
-  const blocks = { d: 'block-d', h: 'block-h', m: 'block-m', s: 'block-s' };
+  const cur = { days: d, hours: h, minutes: m, seconds: s };
 
-  for (const key of ['d', 'h', 'm', 's']) {
-    if (prevValues[key] === cur[key]) continue;
-
-    const numEl   = document.getElementById(ids[key]);
-    const blockEl = document.getElementById(blocks[key]);
-
-    numEl.classList.add('flip');
-    setTimeout(() => {
-      numEl.textContent = pad(cur[key]);
-      numEl.classList.remove('flip');
-    }, 150);
-
-    blockEl.classList.add('active');
-    setTimeout(() => blockEl.classList.remove('active'), 600);
-
-    prevValues[key] = cur[key];
+  for (const key of ['days', 'hours', 'minutes', 'seconds']) {
+    if (prevValues[key] !== cur[key]) {
+      rollDigit(key, cur[key]);
+      prevValues[key] = cur[key];
+    }
   }
 
   const pct = totalSeconds > 0
@@ -160,25 +166,15 @@ function updateDisplay(secs) {
   progressFill.style.width  = pct + '%';
   progressLabel.textContent = pct + '% elapsed';
 
-  if (secs > 0) {
-    const endTime = new Date(Date.now() + secs * 1000);
-    progressTime.textContent = 'ends ' + endTime.toLocaleTimeString([], {
-      hour: '2-digit', minute: '2-digit'
-    });
-  } else {
-    progressTime.textContent = '–';
-  }
+  progressTime.textContent = secs > 0
+    ? 'ends ' + new Date(Date.now() + secs * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : '–';
 }
 
 // ── Status indicator ──
 function setStatus(state) {
   statusDot.className = 'status-dot';
-  const labels = {
-    running: 'Running',
-    paused:  'Paused',
-    done:    'Done',
-    ready:   'Ready',
-  };
+  const labels = { running: 'Running', paused: 'Paused', done: 'Done', ready: 'Ready' };
   if (state === 'running') statusDot.classList.add('running');
   if (state === 'done')    statusDot.classList.add('done');
   statusText.textContent = labels[state] || 'Ready';
@@ -186,7 +182,6 @@ function setStatus(state) {
 
 // ── Button visibility ──
 function setButtonState(state) {
-  startBtn.style.display  = state === 'idle'    ? 'inline-block' : 'none';
   pauseBtn.style.display  = state === 'running' ? 'inline-block' : 'none';
   resumeBtn.style.display = state === 'paused'  ? 'inline-block' : 'none';
 }
