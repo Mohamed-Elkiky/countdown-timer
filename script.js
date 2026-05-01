@@ -51,7 +51,8 @@ function getDuration() {
   const d = parseInt(document.getElementById('inputDays').value)    || 0;
   const h = parseInt(document.getElementById('inputHours').value)   || 0;
   const m = parseInt(document.getElementById('inputMinutes').value) || 0;
-  return (d * 86400) + (h * 3600) + (m * 60);
+  const s = parseInt(document.getElementById('inputSeconds').value) || 0;
+  return (d * 86400) + (h * 3600) + (m * 60) + s;
 }
 
 function startTimer() {
@@ -61,7 +62,6 @@ function startTimer() {
   totalSeconds = dur;
   remaining    = dur;
 
-  // pre-fill prevValues with starting values so nothing rolls on first render
   const d = Math.floor(remaining / 86400);
   const h = Math.floor((remaining % 86400) / 3600);
   const m = Math.floor((remaining % 3600) / 60);
@@ -165,7 +165,6 @@ function rollDigit(id, newValue) {
   const roller = document.getElementById(id);
   const newVal = pad(newValue);
 
-  // wipe and animate in fresh — no dual-element race condition
   roller.innerHTML = '';
 
   const newInner = document.createElement('div');
