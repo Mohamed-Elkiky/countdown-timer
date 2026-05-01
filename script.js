@@ -92,6 +92,11 @@ function tick() {
     setStatus('done');
     setButtonState('idle');
     doneMsg.style.display = 'block';
+
+    const selected = document.querySelector('input[name="sound"]:checked').value;
+    if (selected === 'sad')   playSad();
+    if (selected === 'happy') playHappy();
+    if (selected === 'alarm') playAlarm();
   }
 }
 
@@ -188,6 +193,62 @@ function updateProgress(secs) {
   progressTime.textContent  = secs > 0
     ? 'ends ' + new Date(Date.now() + secs * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : '–';
+}
+
+// ── Sound engine ──
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new AudioContext();
+  return audioCtx;
+}
+
+function playTone(frequency, type, startTime, duration, volume = 0.3) {
+  const ctx  = getCtx();
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.type      = type;
+  osc.frequency.setValueAtTime(frequency, startTime);
+  gain.gain.setValueAtTime(volume, startTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+  osc.start(startTime);
+  osc.stop(startTime + duration);
+}
+
+function playSad() {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  // descending minor melody — slow and heavy
+  const notes = [392, 349, 330, 294, 262];
+  notes.forEach((freq, i) => {
+    playTone(freq, 'sine', now + i * 0.6, 0.8, 0.25);
+  });
+}
+
+function playHappy() {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  // ascending major arpeggio — bright and quick
+  const notes = [262, 330, 392, 523, 659];
+  notes.forEach((freq, i) => {
+    playTone(freq, 'triangle', now + i * 0.18, 0.3, 0.3);
+  });
+}
+
+function playAlarm() {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  // alternating two-tone beep — classic alarm
+  for (let i = 0; i < 6; i++) {
+    const freq = i % 2 === 0 ? 880 : 1100;
+    playTone(freq, 'square', now + i * 0.25, 0.2, 0.15);
+  }
 }
 
 // ── Status indicator ──
