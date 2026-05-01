@@ -4,10 +4,11 @@ A clean, minimal countdown timer built with vanilla HTML, CSS, and JavaScript. N
 
 ## Features
 
-- Set a custom duration in days, hours, and minutes
+- Set a custom duration in days, hours, minutes, and seconds
+- Choose an alarm sound on completion — sad, happy, or alarm
 - Editable timer name — click the title to rename
 - Start, pause, resume, and reset controls
-- Animated digit transitions on each tick
+- Roller animation on each digit tick
 - Progress bar with percentage elapsed and estimated end time
 - Pulsing status indicator (Ready / Running / Paused / Done)
 - Fully responsive down to mobile
@@ -23,26 +24,26 @@ countdown-timer/
 No build step required. Just clone the repo and open `index.html` in your browser.
 
 ```bash
-https://github.com/Mohamed-Elkiky/countdown-timer.git
-
+git clone https://github.com/Mohamed-Elkiky/countdown-timer.git
 cd countdown-timer
-
 open index.html
-
+```
 
 ## Usage
 
-1. Set your desired duration using the **Days**, **Hours**, and **Minutes** inputs
-2. Click the title to give your timer a name
-3. Hit **Start** to begin the countdown
-4. Use **Pause** / **Resume** to control it mid-run
-5. **Reset** clears everything back to zero
+1. Set your desired duration using the **Days**, **Hours**, **Minutes**, and **Seconds** inputs
+2. Choose an alarm sound — **Sad**, **Happy**, or **Alarm**
+3. Click the title to give your timer a name
+4. Hit **Start** to begin the countdown
+5. Use **Pause** / **Resume** to control it mid-run
+6. **Reset** clears everything and returns to the setup screen
 
 ## Tech Stack
 
 - HTML5
 - CSS3 (custom properties, grid, keyframe animations)
 - Vanilla JavaScript (ES6+)
+- Web Audio API (for generated alarm sounds — no audio files needed)
 
 ## License
 
