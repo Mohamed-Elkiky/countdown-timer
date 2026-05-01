@@ -60,15 +60,20 @@ function startTimer() {
 
   totalSeconds = dur;
   remaining    = dur;
-  prevValues   = { days: null, hours: null, minutes: null, seconds: null };
+
+  // pre-fill prevValues with starting values so nothing rolls on first render
+  const d = Math.floor(remaining / 86400);
+  const h = Math.floor((remaining % 86400) / 3600);
+  const m = Math.floor((remaining % 3600) / 60);
+  const s = remaining % 60;
+  prevValues = { days: d, hours: h, minutes: m, seconds: s };
 
   timerName.textContent = titleDisplay.textContent;
-
   setupView.classList.add('hidden');
   timerView.classList.remove('hidden');
 
   doneMsg.style.display = 'none';
-  updateDisplay(remaining);
+  renderDisplay(remaining);
   setStatus('running');
   setButtonState('running');
 
@@ -120,53 +125,68 @@ function resetTimer() {
   progressTime.textContent  = '–';
 }
 
-// ── Roller animation ──
+// ── Helpers ──
 function pad(n) { return String(n).padStart(2, '0'); }
 
+function decompose(secs) {
+  return {
+    days:    Math.floor(secs / 86400),
+    hours:   Math.floor((secs % 86400) / 3600),
+    minutes: Math.floor((secs % 3600) / 60),
+    seconds: secs % 60,
+  };
+}
+
+// ── Initial render (no animation) ──
+function renderDisplay(secs) {
+  const cur = decompose(secs);
+  for (const key of ['days', 'hours', 'minutes', 'seconds']) {
+    const roller = document.getElementById(key);
+    roller.innerHTML = `<div class="digit-inner">${pad(cur[key])}</div>`;
+  }
+  updateProgress(secs);
+}
+
+// ── Tick render (with animation, only changed digits) ──
+function updateDisplay(secs) {
+  const cur = decompose(secs);
+
+  for (const key of ['days', 'hours', 'minutes', 'seconds']) {
+    if (prevValues[key] === cur[key]) continue;
+    rollDigit(key, cur[key]);
+    prevValues[key] = cur[key];
+  }
+
+  updateProgress(secs);
+}
+
+// ── Roller animation ──
 function rollDigit(id, newValue) {
-  const roller   = document.getElementById(id);
-  const oldInner = roller.querySelector('.digit-inner');
-  const newVal   = pad(newValue);
+  const roller = document.getElementById(id);
+  const newVal = pad(newValue);
 
-  // animate old digit out downward
-  oldInner.classList.add('roll-out');
+  // wipe and animate in fresh — no dual-element race condition
+  roller.innerHTML = '';
 
-  // create new digit entering from top
   const newInner = document.createElement('div');
   newInner.classList.add('digit-inner', 'roll-in');
   newInner.textContent = newVal;
-
-  oldInner.addEventListener('animationend', () => {
-    roller.innerHTML = '';
-    roller.appendChild(newInner);
-  }, { once: true });
-
   roller.appendChild(newInner);
+
+  newInner.addEventListener('animationend', () => {
+    newInner.classList.remove('roll-in');
+  }, { once: true });
 }
 
-function updateDisplay(secs) {
-  const d = Math.floor(secs / 86400);
-  const h = Math.floor((secs % 86400) / 3600);
-  const m = Math.floor((secs % 3600) / 60);
-  const s = secs % 60;
-
-  const cur = { days: d, hours: h, minutes: m, seconds: s };
-
-  for (const key of ['days', 'hours', 'minutes', 'seconds']) {
-    if (prevValues[key] !== cur[key]) {
-      rollDigit(key, cur[key]);
-      prevValues[key] = cur[key];
-    }
-  }
-
+// ── Progress bar ──
+function updateProgress(secs) {
   const pct = totalSeconds > 0
     ? Math.round(((totalSeconds - secs) / totalSeconds) * 100)
     : 0;
 
   progressFill.style.width  = pct + '%';
   progressLabel.textContent = pct + '% elapsed';
-
-  progressTime.textContent = secs > 0
+  progressTime.textContent  = secs > 0
     ? 'ends ' + new Date(Date.now() + secs * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : '–';
 }
